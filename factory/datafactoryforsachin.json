@@ -1,0 +1,9 @@
+{
+	"name": "datafactoryforsachin",
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d2869831-3b5d-43c0-859e-f1af8797ab48",
+		"tenantId": "f30aa434-f669-40e7-8029-985e7df256fc"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "azureSynapseCustAddLinkedServiceDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azureSynapseLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "CustomerAddress"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
