@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "datafactoryforsachin"
+		},
+		"azureBlobStorageLinkedService_connectionString": {
+			"value": ""
+		},
+		"azureStorageGen2LinkedService_accountKey": {
+			"value": ""
+		},
+		"azureSynapseLinkedService_connectionString": {
+			"value": ""
+		},
+		"linkServiceFunctionApp_functionKey": {
+			"value": ""
+		},
+		"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
+			"value": "https://keyvaultforsach.vault.azure.net/"
+		},
+		"azureStorageGen2LinkedService_properties_typeProperties_url": {
+			"value": "https://adlsstorageforsachin.dfs.core.windows.net/"
+		},
+		"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
+			"value": "https://mytestappforsachin.azurewebsites.net"
+		}
+	}
+}

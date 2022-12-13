@@ -1,0 +1,91 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datafactoryforsachin"
+		},
+		"azureBlobStorageLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'azureBlobStorageLinkedService'"
+		},
+		"azureStorageGen2LinkedService_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'azureStorageGen2LinkedService'"
+		},
+		"azureSynapseLinkedService_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'azureSynapseLinkedService'"
+		},
+		"linkServiceFunctionApp_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'linkServiceFunctionApp'"
+		},
+		"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://keyvaultforsach.vault.azure.net/"
+		},
+		"azureStorageGen2LinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlsstorageforsachin.dfs.core.windows.net/"
+		},
+		"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://mytestappforsachin.azurewebsites.net"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "datafactoryforsachin_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"azureBlobStorageLinkedService_connectionString": {
+						"value": "[parameters('azureBlobStorageLinkedService_connectionString')]"
+					},
+					"azureStorageGen2LinkedService_accountKey": {
+						"value": "[parameters('azureStorageGen2LinkedService_accountKey')]"
+					},
+					"azureSynapseLinkedService_connectionString": {
+						"value": "[parameters('azureSynapseLinkedService_connectionString')]"
+					},
+					"linkServiceFunctionApp_functionKey": {
+						"value": "[parameters('linkServiceFunctionApp_functionKey')]"
+					},
+					"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
+						"value": "[parameters('azureKeyVaultLinkedService_properties_typeProperties_baseUrl')]"
+					},
+					"azureStorageGen2LinkedService_properties_typeProperties_url": {
+						"value": "[parameters('azureStorageGen2LinkedService_properties_typeProperties_url')]"
+					},
+					"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('linkServiceFunctionApp_properties_typeProperties_functionAppUrl')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
