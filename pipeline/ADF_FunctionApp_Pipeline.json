@@ -20,6 +20,10 @@
 					"body": {
 						"name": "Sachin"
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LinkServiceForAzureFunction",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
