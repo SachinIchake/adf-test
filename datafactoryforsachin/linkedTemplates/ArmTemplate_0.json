@@ -109,7 +109,8 @@
 						"type": "SecureString",
 						"value": "[parameters('linkServiceFunctionApp_functionKey')]"
 					},
-					"authentication": "Anonymous"
+					"authentication": "MSI",
+					"resourceId": ""
 				}
 			},
 			"dependsOn": []
