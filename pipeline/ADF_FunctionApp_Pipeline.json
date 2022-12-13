@@ -15,15 +15,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"functionName": " myhttpfunction",
+					"functionName": "myhttpfunction",
 					"method": "POST",
 					"body": {
 						"name": "Sachin"
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "linkServiceFunctionApp",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],
