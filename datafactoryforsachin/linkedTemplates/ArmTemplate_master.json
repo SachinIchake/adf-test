@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactoryforsachin"
 		},
+		"LinkServiceForAzureFunction_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'LinkServiceForAzureFunction'"
+		},
 		"azureBlobStorageLinkedService_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azureBlobStorageLinkedService'"
@@ -19,9 +23,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azureSynapseLinkedService'"
 		},
-		"linkServiceFunctionApp_functionKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'functionKey' of 'linkServiceFunctionApp'"
+		"LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://mytestappforsachin.azurewebsites.net"
 		},
 		"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -30,10 +34,6 @@
 		"azureStorageGen2LinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlsstorageforsachin.dfs.core.windows.net/"
-		},
-		"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://mytestappforsachin.azurewebsites.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -62,6 +62,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"LinkServiceForAzureFunction_functionKey": {
+						"value": "[parameters('LinkServiceForAzureFunction_functionKey')]"
+					},
 					"azureBlobStorageLinkedService_connectionString": {
 						"value": "[parameters('azureBlobStorageLinkedService_connectionString')]"
 					},
@@ -71,17 +74,14 @@
 					"azureSynapseLinkedService_connectionString": {
 						"value": "[parameters('azureSynapseLinkedService_connectionString')]"
 					},
-					"linkServiceFunctionApp_functionKey": {
-						"value": "[parameters('linkServiceFunctionApp_functionKey')]"
+					"LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl')]"
 					},
 					"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
 						"value": "[parameters('azureKeyVaultLinkedService_properties_typeProperties_baseUrl')]"
 					},
 					"azureStorageGen2LinkedService_properties_typeProperties_url": {
 						"value": "[parameters('azureStorageGen2LinkedService_properties_typeProperties_url')]"
-					},
-					"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
-						"value": "[parameters('linkServiceFunctionApp_properties_typeProperties_functionAppUrl')]"
 					}
 				}
 			},

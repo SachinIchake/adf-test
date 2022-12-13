@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "datafactoryforsachin"
 		},
+		"LinkServiceForAzureFunction_functionKey": {
+			"value": ""
+		},
 		"azureBlobStorageLinkedService_connectionString": {
 			"value": ""
 		},
@@ -14,17 +17,14 @@
 		"azureSynapseLinkedService_connectionString": {
 			"value": ""
 		},
-		"linkServiceFunctionApp_functionKey": {
-			"value": ""
+		"LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl": {
+			"value": "https://mytestappforsachin.azurewebsites.net"
 		},
 		"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
 			"value": "https://keyvaultforsach.vault.azure.net/"
 		},
 		"azureStorageGen2LinkedService_properties_typeProperties_url": {
 			"value": "https://adlsstorageforsachin.dfs.core.windows.net/"
-		},
-		"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
-			"value": "https://mytestappforsachin.azurewebsites.net"
 		},
 		"containerUri": {
 			"value": ""

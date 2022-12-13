@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactoryforsachin"
 		},
+		"LinkServiceForAzureFunction_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'LinkServiceForAzureFunction'"
+		},
 		"azureBlobStorageLinkedService_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azureBlobStorageLinkedService'"
@@ -19,9 +23,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azureSynapseLinkedService'"
 		},
-		"linkServiceFunctionApp_functionKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'functionKey' of 'linkServiceFunctionApp'"
+		"LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://mytestappforsachin.azurewebsites.net"
 		},
 		"azureKeyVaultLinkedService_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -30,16 +34,30 @@
 		"azureStorageGen2LinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlsstorageforsachin.dfs.core.windows.net/"
-		},
-		"linkServiceFunctionApp_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://mytestappforsachin.azurewebsites.net"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LinkServiceForAzureFunction')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('LinkServiceForAzureFunction_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('LinkServiceForAzureFunction_functionKey')]"
+					},
+					"authentication": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/azureBlobStorageLinkedService')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -97,23 +115,46 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/linkServiceFunctionApp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/ADF_FunctionApp_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"type": "AzureFunction",
-				"typeProperties": {
-					"functionAppUrl": "[parameters('linkServiceFunctionApp_properties_typeProperties_functionAppUrl')]",
-					"functionKey": {
-						"type": "SecureString",
-						"value": "[parameters('linkServiceFunctionApp_functionKey')]"
-					},
-					"authentication": "MSI",
-					"resourceId": ""
-				}
+				"activities": [
+					{
+						"name": "testFunction",
+						"type": "AzureFunctionActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"functionName": "myhttpfunction",
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"name": "Sachin"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LinkServiceForAzureFunction",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LinkServiceForAzureFunction')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/azureADLSCSVCreditCardNoLinkedServiceDataSet')]",
@@ -352,48 +393,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/azureSynapseLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ADF_FunctionApp_Pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "testFunction",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": " myhttpfunction",
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"name": "Sachin"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "linkServiceFunctionApp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/linkServiceFunctionApp')]"
 			]
 		},
 		{
