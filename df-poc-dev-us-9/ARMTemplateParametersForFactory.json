@@ -4,15 +4,6 @@
 	"parameters": {
 		"factoryName": {
 			"value": "df-poc-dev-us-9"
-		},
-		"AzureBlobStorage2_connectionString": {
-			"value": ""
-		},
-		"AzureBlobStorageLink_connectionString": {
-			"value": ""
-		},
-		"AzureSqlDatabase2_connectionString": {
-			"value": ""
 		}
 	}
 }
