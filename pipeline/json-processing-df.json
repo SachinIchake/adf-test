@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "jsonProcessingDataflow",
+						"referenceName": "jsonProcessingDF",
 						"type": "DataFlowReference"
 					},
 					"compute": {
