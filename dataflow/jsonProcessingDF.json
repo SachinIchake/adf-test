@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "dataflowAzureSqlTabl",
+						"referenceName": "dataflowAzureSql",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
