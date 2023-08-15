@@ -86,13 +86,13 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "AzureSqldb",
+									"referenceName": "azuresqldb",
 									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
 								{
-									"referenceName": "AzureSqldb",
+									"referenceName": "azuresqldb",
 									"type": "DatasetReference"
 								}
 							]
