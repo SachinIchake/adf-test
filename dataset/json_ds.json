@@ -10,7 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "userinfo.json",
+				"fileName": "run1.json",
+				"folderPath": "icicdemo",
 				"fileSystem": "icrm"
 			}
 		},
