@@ -224,7 +224,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "Sales",
-					"table": "products"
+					"table": "products1"
 				}
 			},
 			"dependsOn": [
@@ -812,6 +812,377 @@
 			"properties": {
 				"activities": [
 					{
+						"name": "Copy From Source",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "json_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"jsonData": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-02T12:50:41Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
+				"[concat(variables('factoryId'), '/datasets/json_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/jsonProcessingDataflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "json_ds",
+								"type": "DatasetReference"
+							},
+							"name": "datasource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dataflowAzureSqlTabl",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flattendata"
+						},
+						{
+							"name": "flattenvendor"
+						},
+						{
+							"name": "flattenupdatewhitelist"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          currentPage as boolean,",
+						"          data as (companyId as short, createdDate as string, deptFullCode as string, designation as string, desiredSkill as string, distributedChannels as string[], employeeJobDistribution as string, enabledForCareerSite as boolean, endtDate as string, id as short, jobCode as short, jobTitle as string, jobUrl as string, jobVisibiltyLevel as string, location as string, maxJobSalary as string, maxYrsOfExperience as string, minJobSalary as string, minYrsOfExperience as string, modifiedDate as string, positionsReq as boolean, privateJobShare as boolean, qualification as string, role as string, skillSet as string, skillsToEvaluate as string, startDate as string, status as boolean, vendorJobDistribution as (groupId as string, id as boolean, jobId as boolean, notified as boolean, profileValidity as string, userId as boolean, validityInDays as boolean, vendor as (added_date as string, companyId as boolean, creditConfig as string, email as string, endDate as string, id as boolean, isActive as boolean, isApproved as boolean, lastLoggedIn as string, partnerName as string, reason as string, sourceValidityConfigurationId as string, startDate as string, user as (companyId as boolean, competency as string, departmentalRoles as string, emailId as string, employeeId as string, id as boolean, isCandidateCredentialSent as boolean, isInterviewCredentialSent as string, issuperuser as boolean, linkedInProfile as string, logoutTime as string, modifiedByUserId as boolean, passwordReuseCount as boolean, phoneNo as string, roleId as boolean, status as boolean, subscribeToEmail as string, userDuplicateId as boolean, username as string, uuid as string), userId as boolean, vendorStatus as boolean), vendorAssignDate as string, vendorId as boolean, vendorName as string)[])[],",
+						"          pageSize as short,",
+						"          totalCount as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> datasource",
+						"datasource foldDown(unroll(data),",
+						"     mapColumn(",
+						"          parent_companyId = data.companyId,",
+						"          designation = data.designation,",
+						"          desiredSkill = data.desiredSkill,",
+						"          employeeJobDistribution = data.employeeJobDistribution,",
+						"          jobTitle = data.jobTitle,",
+						"          jobUrl = data.jobUrl,",
+						"          location = data.location,",
+						"          jobId = data.endtDate,",
+						"          vendorJobDistribution = data.vendorJobDistribution,",
+						"          distributedChannels = data.distributedChannels",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattendata",
+						"flattendata foldDown(unroll(vendorJobDistribution),",
+						"     mapColumn(",
+						"          jobId = vendorJobDistribution.jobId,",
+						"          vendor_companyId = vendorJobDistribution.vendor.companyId,",
+						"          partnerName = vendorJobDistribution.vendor.partnerName,",
+						"          vendorName = vendorJobDistribution.vendorName,",
+						"          designation,",
+						"          desiredSkill,",
+						"          location,",
+						"          distributedChannels,",
+						"          companyId = parent_companyId",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenvendor",
+						"flattenvendor foldDown(unroll(distributedChannels),",
+						"     mapColumn(",
+						"          companyId,",
+						"          location,",
+						"          desiredSkill,",
+						"          designation,",
+						"          vendorName,",
+						"          partnerName,",
+						"          vendor_companyId,",
+						"          distributedChannels",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenupdatewhitelist",
+						"flattenupdatewhitelist sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     preCommands: [],",
+						"     postCommands: []) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/json_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dataflowAzureSqlTabl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/json-processing_icici_Demo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Copy From Source",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "json_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Copy From Source",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "json_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Set variable",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "jsonData",
+							"value": {
+								"value": "@activity('Lookup').output",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Copy to sink",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set variable",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n  \nSELECT   \n    value.id,  \n    value.Name,  \n    data.Color,  \n    COALESCE(data.[capacity], CAST(data.[capacity GB] AS NVARCHAR(50))),  \n    data.Price  \nFROM OPENJSON(@json)   \nWITH (  \n    id INT,  \n    name NVARCHAR(255),  \n    data NVARCHAR(MAX) AS JSON  \n) AS value  \nOUTER APPLY OPENJSON(value.Data)   \nWITH (  \n    color NVARCHAR(50),  \n    [capacity] NVARCHAR(50),  \n    [capacity GB] INT,  \n    price DECIMAL(10, 2)  \n) AS data;  \n",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureSqldb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "AzureSqldb",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"jsonData": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-05-02T12:50:41Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/json_ds')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqldb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/json-processing_icici_copy2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
 						"name": "ForEach1",
 						"type": "ForEach",
 						"dependsOn": [
@@ -1014,115 +1385,6 @@
 				"[concat(variables('factoryId'), '/datasets/json_ds')]",
 				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqldb')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/jsonProcessingDataflow')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "json_ds",
-								"type": "DatasetReference"
-							},
-							"name": "datasource"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "dataflowAzureSqlTabl",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "flattendata"
-						},
-						{
-							"name": "flattenvendor"
-						},
-						{
-							"name": "flattenupdatewhitelist"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          currentPage as boolean,",
-						"          data as (companyId as short, createdDate as string, deptFullCode as string, designation as string, desiredSkill as string, distributedChannels as string[], employeeJobDistribution as string, enabledForCareerSite as boolean, endtDate as string, id as short, jobCode as short, jobTitle as string, jobUrl as string, jobVisibiltyLevel as string, location as string, maxJobSalary as string, maxYrsOfExperience as string, minJobSalary as string, minYrsOfExperience as string, modifiedDate as string, positionsReq as boolean, privateJobShare as boolean, qualification as string, role as string, skillSet as string, skillsToEvaluate as string, startDate as string, status as boolean, vendorJobDistribution as (groupId as string, id as boolean, jobId as boolean, notified as boolean, profileValidity as string, userId as boolean, validityInDays as boolean, vendor as (added_date as string, companyId as boolean, creditConfig as string, email as string, endDate as string, id as boolean, isActive as boolean, isApproved as boolean, lastLoggedIn as string, partnerName as string, reason as string, sourceValidityConfigurationId as string, startDate as string, user as (companyId as boolean, competency as string, departmentalRoles as string, emailId as string, employeeId as string, id as boolean, isCandidateCredentialSent as boolean, isInterviewCredentialSent as string, issuperuser as boolean, linkedInProfile as string, logoutTime as string, modifiedByUserId as boolean, passwordReuseCount as boolean, phoneNo as string, roleId as boolean, status as boolean, subscribeToEmail as string, userDuplicateId as boolean, username as string, uuid as string), userId as boolean, vendorStatus as boolean), vendorAssignDate as string, vendorId as boolean, vendorName as string)[])[],",
-						"          pageSize as short,",
-						"          totalCount as short",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     documentForm: 'arrayOfDocuments') ~> datasource",
-						"datasource foldDown(unroll(data),",
-						"     mapColumn(",
-						"          parent_companyId = data.companyId,",
-						"          designation = data.designation,",
-						"          desiredSkill = data.desiredSkill,",
-						"          employeeJobDistribution = data.employeeJobDistribution,",
-						"          jobTitle = data.jobTitle,",
-						"          jobUrl = data.jobUrl,",
-						"          location = data.location,",
-						"          jobId = data.endtDate,",
-						"          vendorJobDistribution = data.vendorJobDistribution,",
-						"          distributedChannels = data.distributedChannels",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattendata",
-						"flattendata foldDown(unroll(vendorJobDistribution),",
-						"     mapColumn(",
-						"          jobId = vendorJobDistribution.jobId,",
-						"          vendor_companyId = vendorJobDistribution.vendor.companyId,",
-						"          partnerName = vendorJobDistribution.vendor.partnerName,",
-						"          vendorName = vendorJobDistribution.vendorName,",
-						"          designation,",
-						"          desiredSkill,",
-						"          location,",
-						"          distributedChannels,",
-						"          companyId = parent_companyId",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattenvendor",
-						"flattenvendor foldDown(unroll(distributedChannels),",
-						"     mapColumn(",
-						"          companyId,",
-						"          location,",
-						"          desiredSkill,",
-						"          designation,",
-						"          vendorName,",
-						"          partnerName,",
-						"          vendor_companyId,",
-						"          distributedChannels",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattenupdatewhitelist",
-						"flattenupdatewhitelist sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     preCommands: [],",
-						"     postCommands: []) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/json_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dataflowAzureSqlTabl')]"
 			]
 		},
 		{
