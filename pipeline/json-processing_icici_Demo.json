@@ -132,7 +132,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n  \nSELECT   \n    value.id,  \n    value.Name,  \n    data.Color,  \n    COALESCE(data.[capacity], CAST(data.[capacity GB] AS NVARCHAR(50))),  \n    data.Price  \nFROM OPENJSON(@json)   \nWITH (  \n    id INT,  \n    name NVARCHAR(255),  \n    data NVARCHAR(MAX) AS JSON  \n) AS value  \nOUTER APPLY OPENJSON(value.Data)   \nWITH (  \n    color NVARCHAR(50),  \n    [capacity] NVARCHAR(50),  \n    [capacity GB] INT,  \n    price DECIMAL(10, 2)  \n) AS data;  \n",
+						"sqlReaderQuery": {
+							"value": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n  \nSELECT   \n    value.id as id,  \n    value.Name as name,  \n    data.Color as color,  \n    COALESCE(data.[capacity], CAST(data.[capacity GB] AS NVARCHAR(50))) as capacity,  \n    data.Price as price  \nFROM OPENJSON(@json)   \nWITH (  \n    id INT,  \n    name NVARCHAR(255),  \n    data NVARCHAR(MAX) AS JSON  \n) AS value  \nOUTER APPLY OPENJSON(value.Data)   \nWITH (  \n    color NVARCHAR(50),  \n    [capacity] NVARCHAR(50),  \n    [capacity GB] INT,  \n    price DECIMAL(10, 2)  \n) AS data;  \n\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
