@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfforsachin"
+		},
+		"AzureSqlDatabase1_password": {
+			"value": ""
+		},
+		"AzureSqlDatabaseLink_connectionString": {
+			"value": ""
+		},
+		"stogage_gen2_link_accountKey": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://demostoragenotrodelete.dfs.core.windows.net/"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "sqldbforsachin.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "uatdb"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "sachin"
+		},
+		"stogage_gen2_link_properties_typeProperties_url": {
+			"value": "https://mystorageactforsachin.dfs.core.windows.net/"
+		}
+	}
+}
