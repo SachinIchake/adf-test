@@ -28,6 +28,9 @@
 		},
 		"stogage_gen2_link_properties_typeProperties_url": {
 			"value": "https://mystorageactforsachin.dfs.core.windows.net/"
+		},
+		"Opensourcerest_properties_typeProperties_url": {
+			"value": "https://api.restful-api.dev/objects/6"
 		}
 	}
 }

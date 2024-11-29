@@ -39,6 +39,10 @@
 			"type": "string",
 			"defaultValue": "https://mystorageactforsachin.dfs.core.windows.net/"
 		},
+		"Opensourcerest_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.restful-api.dev/objects/6"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -89,6 +93,9 @@
 					},
 					"stogage_gen2_link_properties_typeProperties_url": {
 						"value": "[parameters('stogage_gen2_link_properties_typeProperties_url')]"
+					},
+					"Opensourcerest_properties_typeProperties_url": {
+						"value": "[parameters('Opensourcerest_properties_typeProperties_url')]"
 					}
 				}
 			},

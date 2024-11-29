@@ -38,6 +38,10 @@
 		"stogage_gen2_link_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://mystorageactforsachin.dfs.core.windows.net/"
+		},
+		"Opensourcerest_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.restful-api.dev/objects/6"
 		}
 	},
 	"variables": {
@@ -383,7 +387,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n  \nSELECT *\nFROM OPENJSON(@json, N'$.data') \nWITH ( \njobTitle NVARCHAR(MAX) N'$.jobTitle',\njobCode NVARCHAR(MAX) N'$.jobCode' ,\nlocation NVARCHAR(MAX) N'$.location',\nskillSet NVARCHAR(MAX) N'$.skillSet',\ncompanyId INT  N'$.companyId',\ndeptFullCode NVARCHAR(MAX) N'$.deptFullCode',\nvendorJobDistribution  NVARCHAR(MAX) N'$.vendorJobDistribution' as JSON,\ndistributedChannels NVARCHAR(MAX) N'$.distributedChannels' as JSON\n) \nOUTER APPLY OPENJSON(vendorJobDistribution) WITH \n(\njobId NVARCHAR(MAX) N'$.jobId',\nuserId NVARCHAR(MAX) N'$.userId',\nvendor_userId NVARCHAR(MAX) N'$.vendor.userId',\nuser_uuid NVARCHAR(MAX) N'$.vendor.user.uuid'\n)\nOUTER APPLY OPENJSON(distributedChannels) WITH \n(\nvalue nvarchar(max) '$'\n)\n;\n",
+												"value": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n  \nSELECT   \n    value.id,  \n    value.Name,  \n    data.Color,  \n    COALESCE(data.[capacity], CAST(data.[capacity GB] AS NVARCHAR(50))),  \n    data.Price  \nFROM OPENJSON(@json)   \nWITH (  \n    id INT,  \n    name NVARCHAR(255),  \n    data NVARCHAR(MAX) AS JSON  \n) AS value  \nOUTER APPLY OPENJSON(value.Data)   \nWITH (  \n    color NVARCHAR(50),  \n    [capacity] NVARCHAR(50),  \n    [capacity GB] INT,  \n    price DECIMAL(10, 2)  \n) AS data;  \n",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -427,7 +431,14 @@
 					{
 						"name": "Lookup",
 						"type": "Lookup",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Copy From Source",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -455,6 +466,54 @@
 							},
 							"firstRowOnly": false
 						}
+					},
+					{
+						"name": "Copy From Source",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "json_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -470,6 +529,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/json_ds')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqldb')]"
 			]
 		},
@@ -508,7 +568,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "Sales",
-					"table": "customer"
+					"table": "products"
 				}
 			},
 			"dependsOn": [
@@ -719,7 +779,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "userinfo.json",
+						"fileName": "run1.json",
+						"folderPath": "icicdemo",
 						"fileSystem": "icrm"
 					}
 				},
@@ -1076,6 +1137,39 @@
 				"annotations": []
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Opensourcerest')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Opensourcerest_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": false,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Opensourcerest",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Opensourcerest')]"
+			]
 		}
 	]
 }
