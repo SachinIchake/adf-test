@@ -105,7 +105,7 @@
 				"typeProperties": {
 					"variableName": "jsonData",
 					"value": {
-						"value": "@activity('Lookup').output",
+						"value": "@activity('Lookup').output.value",
 						"type": "Expression"
 					}
 				}
