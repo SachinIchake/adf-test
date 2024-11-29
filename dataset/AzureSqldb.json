@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "Sales",
-			"table": "products"
+			"table": "products1"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
