@@ -1,0 +1,9 @@
+{
+	"name": "adfforsachin",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "1f58c6c7-10fb-4e20-85b6-d3073866db6f",
+		"tenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3"
+	}
+}
