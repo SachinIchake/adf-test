@@ -1,0 +1,12 @@
+{
+	"name": "Opensourcerest",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://api.restful-api.dev/objects/6",
+			"enableServerCertificateValidation": false,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
