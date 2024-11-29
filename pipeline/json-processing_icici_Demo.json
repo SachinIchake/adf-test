@@ -167,7 +167,7 @@
 		],
 		"variables": {
 			"jsonData": {
-				"type": "String"
+				"type": "Array"
 			}
 		},
 		"annotations": [],
