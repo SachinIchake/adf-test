@@ -41,7 +41,7 @@
 		},
 		"Opensourcerest_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.restful-api.dev/objects/6"
+			"defaultValue": "https://api.restful-api.dev/objects"
 		},
 		"containerUri": {
 			"type": "string",
